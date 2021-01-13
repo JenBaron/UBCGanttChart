@@ -1,0 +1,221 @@
+---
+title: "Gantt Chart"
+author: "Jen Baron"
+date: "May 5, 2020"
+output:
+  html_document:
+  pdf_document: default
+---
+
+
+Source Code: https://www.molecularecologist.com/2019/01/simple-gantt-charts-in-r-with-ggplot2-and-the-tidyverse/
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+I open a terminal and load up the tidyverse packages:
+```{r}
+library(tidyverse)
+library(nationalparkcolors)
+```
+
+# MSc
+
+Then I load the text file containing the schedule data. I also set up two vectors containing the unique names of activities in the schedule file, and the unique names of the project elements. These will come in handy for controlling the display order of the items in the Gantt chart.
+```{r}
+gantt <- read.csv("data/gantt.csv", h=T)
+gantt
+
+acts <- c(
+  "Literature review",
+  "Proposal development",
+  "Initial data exploration",
+  "Classification & transition matrices",
+  "Quantification of landscape change",
+  "PCA",
+  "Quantification of landscape drivers",
+  "RDA",
+  "Variance partitioning & linear models",
+  "Spatial assessment ",
+  "Interpretation of results",
+  "Thesis: Chapter 1",
+  "Thesis: Chapter 2",
+  "Thesis: Chapter 3",
+  "Thesis: Working draft",
+  "Publication development",
+  "Thesis: Submission & defense")
+
+els <- c("Project Development",
+         "Deliverable",
+         "Analysis",
+         "Statistics")
+
+```
+
+
+To work neatly with ggplot, I need the start and end dates to be in a single column, with another column to identify whether they’re the start or end date. This is the job of the gather() function. I’m also going to convert the Activities and Project.element columns into factors, with levels defined to control the order in which they appear in the chart. This is where those two vectors of activity and project element names come in — the ordering of names in those vectors can determine the ordering of levels in the factors.
+
+With tidyverse notation, I can do this all on one line of code:
+```{r}
+g.gantt <- gather(gantt, "state", "date", 4:5) %>% mutate(date = as.Date(date, "%Y.%m.%d"), Activity=factor(Activity, acts[length(acts):1]), Project.element=factor(Project.element, els))
+
+tail(g.gantt)
+```
+
+
+```{r}
+pal <- park_palette("GrandTeton")
+```
+
+```{r}
+gantt.chart <- ggplot(g.gantt,
+       aes(date, Activity, colour = Project.element, group = Item)) +
+       geom_line(size = 6) + 
+       scale_color_manual(values = pal, name = "Project Component") +
+       labs(x = "", y = NULL, title = "Project Timeline") +
+       theme_classic() +
+       theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) +
+       scale_x_date(date_labels =  "%b %Y", breaks = as.Date(c("2019-09-01", "2020-01-1", "2020-05-01", "2020-09-01", "2021-01-01", "2021-05-01","2021-09-01")))
+
+gantt.chart
+
+ggsave("figures/gantt.chart.jpeg", gantt.chart, units = "cm", width = 20, height = 12)
+```
+
+
+# PhD
+
+```{r}
+gantt2 <- read.csv("data/ganttPhD.csv", h=T)
+gantt2
+
+acts2 <- c(
+"Literature Review",
+"GEM 500: Landscape Ecology",
+"FRST 547: Forestry in BC",
+"FRST 505: Dendrochronology",
+"MSc Proposal",
+"Data Acquisition (Ch 2-3)",
+"Committee Meeting 1",
+"Air Photo Classification",
+"FRST 505: Fire Ecology ",
+"Thesis: Chapter 1",
+"Air Photo Analysis",
+"Committee Meeting 2",
+"Thesis: Chapter 2",
+"Transfer to PhD",
+"PhD Proposal",
+"Committee Meeting 3",
+"Comprehensive Exam",
+"Thesis: Chapter 3",
+"Scholarship Applications",
+"Data Acquisition (Ch 4-5)",
+"Model Development",
+"Committee Meeting 4",
+"Thesis: Chapter 4",
+"Model Refinement",
+"Committee Meeting 5",
+"Thesis: Chapter 5",
+"Committee Meeting 6",
+"Thesis: Draft",
+"Thesis: Submission & Defense")
+
+els2 <- c("Project Development",
+         "Course",
+         "Milestone",
+         "Deliverable",
+         "Analysis")
+
+```
+
+
+```{r}
+g.gantt2 <- gather(gantt2, "state", "date", 4:5) %>% mutate(date = as.Date(date, "%Y.%m.%d"), Activity=factor(Activity, acts2[length(acts2):1]), Project.element=factor(Project.element, els2))
+
+tail(g.gantt2)
+```
+
+```{r}
+pal <- park_palette("Yosemite")
+
+gantt.chart2 <- ggplot(g.gantt2,
+       aes(date, Activity, colour = Project.element, group = Item)) +
+       geom_line(size = 3.5) + 
+       scale_color_manual(values = pal, name = "Degree Component") +
+       labs(x = "", y = NULL, title = "PhD Timeline") +
+       theme_classic() +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+       theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) 
+
+gantt.chart2
+
+#ggsave("figures/gantt.chart2.jpeg", gantt.chart2, units = "cm", width = 20, height = 12)
+```
+
+# PhD_simple
+
+```{r}
+gantt3 <- read.csv("data/ganttPhD_simple.csv", h=T)
+gantt3
+
+acts3 <- c(
+"Literature Review",
+"MSc Proposal",
+"Data Acquisition I",
+"Air Photo Classification",
+"Thesis: Review Chapter 1",
+"Thesis: Review Chapter 2",
+"PhD Proposal",
+"Air Photo Analysis",
+"Comprehensive Exam",
+"Thesis: Data Chapter 1",
+"PGS-D & Vanier Applications",
+"Data Acquisition II",
+"Model Development",
+"Thesis: Data Chapter 2",
+"Model Refinement",
+"Thesis: Data Chapter 3",
+"Thesis: Submission & Defense")
+
+els3 <- c("Project Development",
+          "Analysis",
+          "Milestone",
+         "Deliverable")
+
+
+g.gantt3 <- gather(gantt3, "state", "date", 4:5) %>% mutate(date = as.Date(date, "%Y.%m.%d"), Activity=factor(Activity, acts3[length(acts3):1]), Project.element=factor(Project.element, els3))
+
+tail(g.gantt3)
+```
+
+
+```{r}
+pal <- park_palette("Redwoods")
+
+gantt.chart3 <- ggplot(g.gantt3, aes(date, Activity, colour = Project.element, group = Item)) +
+   geom_rect(xmin = as.Date("2021-1-1"), xmax = as.Date("2021-5-1"), 
+              ymin = -Inf,
+              ymax = +Inf, fill = "lightgray", alpha = 0.03, colour = NA) +
+  geom_line(size=5) +
+  # geom_segment(aes(x = as.Date("2021-1-1"), y = "Air Photo Classification", 
+  #                     xend = as.Date("2021-5-1"), yend = "Air Photo Classification"), 
+  #              arrow = arrow(length = unit(0.3, "cm"))) +
+  scale_color_manual(values = pal, name = "Degree Component") +
+  labs(x = "", y = NULL, title = "PhD Timeline") +
+  scale_x_date(date_breaks = "4 months", name = "Year", date_minor_breaks = "4 months",
+               limits = as.Date(c("2019-8-1", "2023-9-1")),
+               date_labels = "%b '%y") +
+  theme_bw() +
+       theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) 
+
+
+gantt.chart3
+
+#ggsave("figures/gantt.chart3.jpeg", gantt.chart3, units = "cm", width = 20, height = 12)
+```
+
+
+
+
