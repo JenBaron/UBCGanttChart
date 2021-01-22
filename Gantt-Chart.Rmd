@@ -165,18 +165,18 @@ acts3 <- c(
 "MSc Proposal",
 "Data Acquisition I",
 "Air Photo Classification",
-"Thesis: Review Chapter 1",
-"Thesis: Review Chapter 2",
+"Chapter 1: Fire History Review",
 "PhD Proposal",
-"Air Photo Analysis",
 "Comprehensive Exam",
-"Thesis: Data Chapter 1",
+"Air Photo Analysis",
 "PGS-D & Vanier Applications",
+"Chapter 2: Air Photos",
+"Chapter 3: Fire Modelling Review",
 "Data Acquisition II",
 "Model Development",
-"Thesis: Data Chapter 2",
+"Chapter 4: Fire Modelling I",
 "Model Refinement",
-"Thesis: Data Chapter 3",
+"Chapter 5: Fire Modelling II",
 "Thesis: Submission & Defense")
 
 els3 <- c("Project Development",
@@ -208,8 +208,7 @@ gantt.chart3 <- ggplot(g.gantt3, aes(date, Activity, colour = Project.element, g
                limits = as.Date(c("2019-8-1", "2023-9-1")),
                date_labels = "%b '%y") +
   theme_bw() +
-       theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) 
-
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) 
 
 gantt.chart3
 
@@ -217,5 +216,8 @@ gantt.chart3
 ```
 
 
+```{r}
+sessionInfo()
+```
 
 
