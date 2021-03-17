@@ -165,7 +165,7 @@ acts3 <- c(
 "MSc Proposal",
 "Data Acquisition I",
 "Air Photo Classification",
-"Chapter 1: Fire History Review",
+"Chapter 1: Fire History",
 "PhD Proposal",
 "Comprehensive Exam",
 "Air Photo Analysis",
@@ -194,7 +194,7 @@ tail(g.gantt3)
 ```{r}
 pal <- park_palette("Redwoods")
 
-gantt.chart3 <- ggplot(g.gantt3, aes(date, Activity, colour = Project.element, group = Item)) +
+gantt.chart4 <- ggplot(g.gantt3, aes(date, Activity, colour = Project.element, group = Item)) +
    geom_rect(xmin = as.Date("2021-1-1"), xmax = as.Date("2021-5-1"), 
               ymin = -Inf,
               ymax = +Inf, fill = "lightgray", alpha = 0.03, colour = NA) +
@@ -204,15 +204,23 @@ gantt.chart3 <- ggplot(g.gantt3, aes(date, Activity, colour = Project.element, g
   #              arrow = arrow(length = unit(0.3, "cm"))) +
   scale_color_manual(values = pal, name = "Degree Component") +
   labs(x = "", y = NULL, title = "PhD Timeline") +
-  scale_x_date(date_breaks = "4 months", name = "Year", date_minor_breaks = "4 months",
+  scale_x_date(date_breaks = "4 months", name = "", date_minor_breaks = "4 months",
                limits = as.Date(c("2019-8-1", "2023-9-1")),
                date_labels = "%b '%y") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+        plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA),
+        legend.background = element_rect(fill = "transparent"), 
+        legend.key = element_rect(fill = "transparent"),
+      legend.box.background = element_rect(fill = "transparent"))
 
-gantt.chart3
+gantt.chart4
 
-#ggsave("figures/gantt.chart3.jpeg", gantt.chart3, units = "cm", width = 20, height = 12)
+ggsave("figures/gantt.chart4.png", gantt.chart4, units = "cm", width = 20, height = 12, bg = "transparent")
 ```
 
 
