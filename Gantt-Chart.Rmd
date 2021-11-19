@@ -21,69 +21,84 @@ library(tidyverse)
 library(nationalparkcolors)
 ```
 
-# MSc
 
-Then I load the text file containing the schedule data. I also set up two vectors containing the unique names of activities in the schedule file, and the unique names of the project elements. These will come in handy for controlling the display order of the items in the Gantt chart.
+# PhD Proposal
+
 ```{r}
-gantt <- read.csv("data/gantt.csv", h=T)
-gantt
+gantt3 <- read.csv("data/ganttPhD_proposal.csv", h=T) %>%
+  rename(Item = ï..Item)
+gantt3
 
-acts <- c(
-  "Literature review",
-  "Proposal development",
-  "Initial data exploration",
-  "Classification & transition matrices",
-  "Quantification of landscape change",
-  "PCA",
-  "Quantification of landscape drivers",
-  "RDA",
-  "Variance partitioning & linear models",
-  "Spatial assessment ",
-  "Interpretation of results",
-  "Thesis: Chapter 1",
-  "Thesis: Chapter 2",
-  "Thesis: Chapter 3",
-  "Thesis: Working draft",
-  "Publication development",
-  "Thesis: Submission & defense")
+acts3 <- c(
+"Coursework",
+"Literature Review",
+"MSc Proposal",
+"Data Acquisition",
+"GEM500: Landscape Ecology (I)",
+"Air Photo Method Development",
+"Fire History Analysis",
+"Chapter 1: Fire History",
+"Field Work (I)",
+"PGS-D & Vanier Applications",
+"GEM500: Landscape Ecology (II)",
+"PhD Proposal",
+"Comprehensive Exam",
+"Air Photo Classification",
+"Chapter 3: Fire Modelling Review",
+"Field Work (II)",
+"Air Photo Analysis",
+"GEM500: Landscape Ecology (III)",
+"Chapter 2: Air Photos",
+"Simulation Model Development",
+"Wildfire Simulation Modelling",
+"GEM500: Landscape Ecology (IV)",
+"Chapter 4: Fire Modelling",
+"Thesis: Submission & Defense")
 
-els <- c("Project Development",
+els3 <- c("Project Development",
+          "Data Collection",
+          "Analysis",
+          "Milestone",
          "Deliverable",
-         "Analysis",
-         "Statistics")
-
-```
+          "Teaching")
 
 
-To work neatly with ggplot, I need the start and end dates to be in a single column, with another column to identify whether they’re the start or end date. This is the job of the gather() function. I’m also going to convert the Activities and Project.element columns into factors, with levels defined to control the order in which they appear in the chart. This is where those two vectors of activity and project element names come in — the ordering of names in those vectors can determine the ordering of levels in the factors.
+g.gantt3 <- gather(gantt3, "state", "date", 4:5) %>% mutate(date = as.Date(date, "%Y.%m.%d"), Activity=factor(Activity, acts3[length(acts3):1]), Project.element=factor(Project.element, els3))
 
-With tidyverse notation, I can do this all on one line of code:
-```{r}
-g.gantt <- gather(gantt, "state", "date", 4:5) %>% mutate(date = as.Date(date, "%Y.%m.%d"), Activity=factor(Activity, acts[length(acts):1]), Project.element=factor(Project.element, els))
-
-tail(g.gantt)
+tail(g.gantt3)
 ```
 
 
 ```{r}
-pal <- park_palette("GrandTeton")
+pal <- park_palette("Arches")
+
+gantt.chart4 <- ggplot(g.gantt3, aes(date, Activity, colour = Project.element, group = Item)) +
+   geom_rect(xmin = as.Date("2021-9-1"), xmax = as.Date("2022-01-01"), 
+              ymin = -Inf,
+              ymax = +Inf, fill = "lightgray", alpha = 0.03, colour = NA) +
+  geom_line(size=4.5) +
+  # geom_segment(aes(x = as.Date("2021-1-1"), y = "Air Photo Classification",
+  #                     xend = as.Date("2021-5-1"), yend = "Air Photo Classification"),
+  #              arrow = arrow(length = unit(0.3, "cm"))) +
+  scale_color_manual(values = pal, name = "Degree Component") +
+  #labs(x = "", y = NULL, title = "PhD Timeline") +
+  scale_x_date(date_breaks = "4 months", name = "", date_minor_breaks = "4 months",
+               limits = as.Date(c("2019-8-1", "2024-8-1")),
+               date_labels = "%b '%y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+        plot.title = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA),
+        legend.background = element_rect(fill = "transparent"), 
+        legend.key = element_rect(fill = "transparent"),
+      legend.box.background = element_rect(fill = "transparent"),
+      legend.position = "bottom")
+
+gantt.chart4
+
+ggsave("figures/gantt.chart4.png", gantt.chart4, units = "cm", width = 18, height = 15)
 ```
-
-```{r}
-gantt.chart <- ggplot(g.gantt,
-       aes(date, Activity, colour = Project.element, group = Item)) +
-       geom_line(size = 6) + 
-       scale_color_manual(values = pal, name = "Project Component") +
-       labs(x = "", y = NULL, title = "Project Timeline") +
-       theme_classic() +
-       theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) +
-       scale_x_date(date_labels =  "%b %Y", breaks = as.Date(c("2019-09-01", "2020-01-1", "2020-05-01", "2020-09-01", "2021-01-01", "2021-05-01","2021-09-01")))
-
-gantt.chart
-
-ggsave("figures/gantt.chart.jpeg", gantt.chart, units = "cm", width = 20, height = 12)
-```
-
 
 # PhD
 
@@ -154,74 +169,71 @@ gantt.chart2
 #ggsave("figures/gantt.chart2.jpeg", gantt.chart2, units = "cm", width = 20, height = 12)
 ```
 
-# PhD_simple
+# MSc
 
+Then I load the text file containing the schedule data. I also set up two vectors containing the unique names of activities in the schedule file, and the unique names of the project elements. These will come in handy for controlling the display order of the items in the Gantt chart.
 ```{r}
-gantt3 <- read.csv("data/ganttPhD_simple.csv", h=T)
-gantt3
+gantt <- read.csv("data/gantt.csv", h=T)
+gantt
 
-acts3 <- c(
-"Literature Review",
-"MSc Proposal",
-"Data Acquisition I",
-"Air Photo Classification",
-"Chapter 1: Fire History",
-"PhD Proposal",
-"Comprehensive Exam",
-"Air Photo Analysis",
-"PGS-D & Vanier Applications",
-"Chapter 2: Air Photos",
-"Chapter 3: Fire Modelling Review",
-"Data Acquisition II",
-"Model Development",
-"Chapter 4: Fire Modelling I",
-"Model Refinement",
-"Chapter 5: Fire Modelling II",
-"Thesis: Submission & Defense")
+acts <- c(
+  "Literature review",
+  "Proposal development",
+  "Initial data exploration",
+  "Classification & transition matrices",
+  "Quantification of landscape change",
+  "PCA",
+  "Quantification of landscape drivers",
+  "RDA",
+  "Variance partitioning & linear models",
+  "Spatial assessment ",
+  "Interpretation of results",
+  "Thesis: Chapter 1",
+  "Thesis: Chapter 2",
+  "Thesis: Chapter 3",
+  "Thesis: Working draft",
+  "Publication development",
+  "Thesis: Submission & defense")
 
-els3 <- c("Project Development",
-          "Analysis",
-          "Milestone",
-         "Deliverable")
+els <- c("Project Development",
+         "Deliverable",
+         "Analysis",
+         "Statistics")
+
+```
 
 
-g.gantt3 <- gather(gantt3, "state", "date", 4:5) %>% mutate(date = as.Date(date, "%Y.%m.%d"), Activity=factor(Activity, acts3[length(acts3):1]), Project.element=factor(Project.element, els3))
+To work neatly with ggplot, I need the start and end dates to be in a single column, with another column to identify whether they’re the start or end date. This is the job of the gather() function. I’m also going to convert the Activities and Project.element columns into factors, with levels defined to control the order in which they appear in the chart. This is where those two vectors of activity and project element names come in — the ordering of names in those vectors can determine the ordering of levels in the factors.
 
-tail(g.gantt3)
+With tidyverse notation, I can do this all on one line of code:
+```{r}
+g.gantt <- gather(gantt, "state", "date", 4:5) %>% mutate(date = as.Date(date, "%Y.%m.%d"), Activity=factor(Activity, acts[length(acts):1]), Project.element=factor(Project.element, els))
+
+tail(g.gantt)
 ```
 
 
 ```{r}
-pal <- park_palette("Redwoods")
-
-gantt.chart4 <- ggplot(g.gantt3, aes(date, Activity, colour = Project.element, group = Item)) +
-   geom_rect(xmin = as.Date("2021-1-1"), xmax = as.Date("2021-5-1"), 
-              ymin = -Inf,
-              ymax = +Inf, fill = "lightgray", alpha = 0.03, colour = NA) +
-  geom_line(size=5) +
-  # geom_segment(aes(x = as.Date("2021-1-1"), y = "Air Photo Classification", 
-  #                     xend = as.Date("2021-5-1"), yend = "Air Photo Classification"), 
-  #              arrow = arrow(length = unit(0.3, "cm"))) +
-  scale_color_manual(values = pal, name = "Degree Component") +
-  labs(x = "", y = NULL, title = "PhD Timeline") +
-  scale_x_date(date_breaks = "4 months", name = "", date_minor_breaks = "4 months",
-               limits = as.Date(c("2019-8-1", "2023-9-1")),
-               date_labels = "%b '%y") +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), 
-        plot.title = element_text(hjust = 0.5),
-        panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_rect(fill = "transparent",colour = NA),
-        plot.background = element_rect(fill = "transparent",colour = NA),
-        legend.background = element_rect(fill = "transparent"), 
-        legend.key = element_rect(fill = "transparent"),
-      legend.box.background = element_rect(fill = "transparent"))
-
-gantt.chart4
-
-ggsave("figures/gantt.chart4.png", gantt.chart4, units = "cm", width = 20, height = 12, bg = "transparent")
+pal <- park_palette("GrandTeton")
 ```
+
+```{r}
+gantt.chart <- ggplot(g.gantt,
+       aes(date, Activity, colour = Project.element, group = Item)) +
+       geom_line(size = 6) + 
+       scale_color_manual(values = pal, name = "Project Component") +
+       labs(x = "", y = NULL, title = "Project Timeline") +
+       theme_classic() +
+       theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) +
+       scale_x_date(date_labels =  "%b %Y", breaks = as.Date(c("2019-09-01", "2020-01-1", "2020-05-01", "2020-09-01", "2021-01-01", "2021-05-01","2021-09-01")))
+
+gantt.chart
+
+ggsave("figures/gantt.chart.jpeg", gantt.chart, units = "cm", width = 20, height = 12)
+```
+
+
+
 
 
 ```{r}
